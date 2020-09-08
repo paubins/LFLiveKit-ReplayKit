@@ -159,7 +159,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 - (void)perpare {
     LFLiveStreamInfo *stream = [LFLiveStreamInfo new];
     // /直播推流地址
-    stream.url = @"rtmp://send3a.douyu.com/live/3523327rRE27GZhP?wsSecret=0498fe929f8783d5f42fb660c23de61a&wsTime=5c08e4bf&wsSeek=off&wm=0&tw=0";
+    stream.url = @"rtmp://live-sfo.twitch.tv/app/live_548605499_G0ldfV1VLQqHQHdjYzOgI4NXJTEIIj";
     
     [self.session startLive:stream];
     

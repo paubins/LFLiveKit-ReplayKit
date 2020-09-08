@@ -54,7 +54,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     _mic = YES;
     _frameQuality = [dict[@"frameQuality"] intValue]; // 0 高 1中 2低
     if (!_url) {
-        _url = @"rtmp://send3a.douyu.com/live/3523327rRE27GZhP?wsSecret=0498fe929f8783d5f42fb660c23de61a&wsTime=5c08e4bf&wsSeek=off&wm=0&tw=0";
+        _url = @"http://paubins.com/live/testing123";
     }
     [self lf];
 }
@@ -72,11 +72,13 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         audioConfiguration.numberOfChannels = 1;
         LFLiveVideoConfiguration *videoConfiguration;
        
-        videoConfiguration = [LFLiveVideoConfiguration defaultConfigurationForQuality:(_frameQuality==0)?LFLiveVideoQuality_High2:(_frameQuality==1)?LFLiveVideoQuality_Medium2:LFLiveVideoQuality_Low2 outputImageOrientation:UIInterfaceOrientationLandscapeRight];
+        videoConfiguration = [LFLiveVideoConfiguration defaultConfigurationForQuality:(_frameQuality==0)?LFLiveVideoQuality_High2:(_frameQuality==1)?LFLiveVideoQuality_Medium2:LFLiveVideoQuality_Low2 outputImageOrientation:UIInterfaceOrientationPortrait];
         
         videoConfiguration.autorotate = YES;
         
-        _session = [[LFLiveSession alloc] initWithAudioConfiguration:audioConfiguration videoConfiguration:videoConfiguration captureType:_mic?LFLiveInputMaskAll:LFLiveInputMaskVideo];
+        _session = [[LFLiveSession alloc] initWithAudioConfiguration:audioConfiguration
+                                                  videoConfiguration:videoConfiguration
+                                                         captureType:_mic?LFLiveInputMaskAll:LFLiveInputMaskVideo];
         
         _session.delegate = self;
         _session.showDebugInfo = YES;

@@ -8,6 +8,9 @@
 #import "LFHardwareVideoEncoder.h"
 #import <VideoToolbox/VideoToolbox.h>
 
+#define kVideoFrameScaleFactor 0.50
+#define kVideoFrameProcessEvery3rdFrame 3
+
 @interface LFHardwareVideoEncoder (){
     VTCompressionSessionRef compressionSession;
     NSInteger frameCount;
@@ -26,6 +29,21 @@
 @end
 
 @implementation LFHardwareVideoEncoder
+{
+    CVPixelBufferPoolRef _pixelBufferPool;
+    CVPixelBufferRef _pixelBuffer;
+    int64_t _num_frames;
+    bool skip_frame;
+    CIContext * _ciContext;
+    CIFilter* _scaleFilter;
+    CIFilter* _mirrorFilter;
+    bool _capturing;
+    
+//    OTBroadcastExtHelper *_broadcastHelper;
+    
+    dispatch_queue_t _capture_queue;
+    
+}
 
 #pragma mark -- LifeCycle
 - (instancetype)initWithVideoStreamConfiguration:(LFLiveVideoConfiguration *)configuration {
@@ -37,12 +55,33 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationDidBecomeActiveNotification object:nil];
 #ifdef DEBUG
         enabledWriteVideoFile = NO;
+        [self initCapture];
         [self initForFilePath];
 #endif
         
     }
     return self;
 }
+
+- (void)initCapture {
+    _scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
+    _mirrorFilter = [CIFilter filterWithName:@"CIAffineTransform"];
+    _ciContext = [CIContext contextWithOptions: nil];
+    _num_frames = 0;
+}
+
+- (bool)shouldSkipFrame
+{
+    if(_num_frames == kVideoFrameProcessEvery3rdFrame)
+    {
+        _num_frames = 0;
+        return NO;
+    } else
+    {
+        return YES;
+    }
+}
+
 
 - (void)resetCompressionSession {
     if (inResetting) {
@@ -111,12 +150,35 @@
 - (void)encodeVideoData:(CVPixelBufferRef)pixelBuffer timeStamp:(uint64_t)timeStamp {
     if(_isBackGround) return;
     frameCount++;
+    _num_frames++;
+    if([self shouldSkipFrame])
+        return;
+    
     if (!compressionSession) {
         return;
     }
     CMTime presentationTimeStamp = CMTimeMake(frameCount, (int32_t)_configuration.videoFrameRate);
     VTEncodeInfoFlags flags;
     CMTime duration = CMTimeMake(1, (int32_t)_configuration.videoFrameRate);
+    
+    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:pixelBuffer
+                                               options:nil];
+    
+    ciImage = [self scaleFilterImage:ciImage
+                     withAspectRatio:0.7 scale:kVideoFrameScaleFactor];
+    
+    if(_pixelBufferPool == nil ||
+       CVPixelBufferGetWidth(pixelBuffer) != CVPixelBufferGetWidth(_pixelBuffer) ||
+       CVPixelBufferGetHeight(pixelBuffer) != CVPixelBufferGetHeight(_pixelBuffer))
+    {
+        [self destroyPixelBuffers];
+        [self createPixelBufferPoolWithWidth:ciImage.extent.size.width
+                                      height:ciImage.extent.size.height];
+        CVPixelBufferPoolCreatePixelBuffer(NULL, _pixelBufferPool, &_pixelBuffer);
+    }
+    
+    [_ciContext render:ciImage toCVPixelBuffer:_pixelBuffer];
+    
     if (@available(iOS 8.0, *)) {
         NSDictionary *properties = nil;
         if (frameCount % (int32_t)_configuration.videoMaxKeyframeInterval == 0) {
@@ -124,7 +186,7 @@
         }
         NSNumber *timeNumber = @(timeStamp);
 
-        OSStatus status = VTCompressionSessionEncodeFrame(compressionSession, pixelBuffer, presentationTimeStamp, duration, (__bridge CFDictionaryRef)properties, (__bridge_retained void *)timeNumber, &flags);
+        OSStatus status = VTCompressionSessionEncodeFrame(compressionSession, _pixelBuffer, presentationTimeStamp, duration, (__bridge CFDictionaryRef)properties, (__bridge_retained void *)timeNumber, &flags);
         if(status != noErr){
             NSLog(@"status != noErr, %d", status);
             [self resetCompressionSession];
@@ -258,5 +320,64 @@ static void VideoCompressonOutputCallback(void *VTref, void *VTFrameRef, OSStatu
     NSString *writablePath = [documentsDirectory stringByAppendingPathComponent:filename];
     return writablePath;
 }
+
+-(void)destroyPixelBuffers
+{
+    if(_pixelBuffer)
+        CVPixelBufferRelease(_pixelBuffer);
+    _pixelBuffer = nil;
+    
+    if(_pixelBufferPool)
+        CVPixelBufferPoolRelease(_pixelBufferPool);
+    _pixelBufferPool = nil;
+}
+
+- (void)createPixelBufferPoolWithWidth:(int)width height:(int)height
+{
+    
+    [self destroyPixelBuffers];
+    OSType pixelFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+    
+    CFMutableDictionaryRef sourcePixelBufferOptions = CFDictionaryCreateMutable( kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks );
+    CFNumberRef number = CFNumberCreate( kCFAllocatorDefault, kCFNumberSInt32Type, &pixelFormat );
+    CFDictionaryAddValue( sourcePixelBufferOptions, kCVPixelBufferPixelFormatTypeKey, number );
+    CFRelease( number );
+    
+    number = CFNumberCreate( kCFAllocatorDefault, kCFNumberSInt32Type, &width );
+    CFDictionaryAddValue( sourcePixelBufferOptions, kCVPixelBufferWidthKey, number );
+    CFRelease( number );
+    
+    number = CFNumberCreate( kCFAllocatorDefault, kCFNumberSInt32Type, &height );
+    CFDictionaryAddValue( sourcePixelBufferOptions, kCVPixelBufferHeightKey, number );
+    CFRelease( number );
+    
+    ((__bridge NSMutableDictionary *)sourcePixelBufferOptions)[(id)kCVPixelBufferIOSurfacePropertiesKey] = @{ @"IOSurfaceIsGlobal" : @YES };
+    
+    CVPixelBufferPoolCreate( kCFAllocatorDefault, NULL, sourcePixelBufferOptions, &_pixelBufferPool);
+}
+
+- (CIImage*) scaleFilterImage: (CIImage*)inputImage withAspectRatio:(CGFloat)aspectRatio scale:(CGFloat)scale
+{
+//    [_scaleFilter setValue:inputImage forKey:kCIInputImageKey];
+    [_scaleFilter setValue:@(scale) forKey:kCIInputScaleKey];
+    [_scaleFilter setValue:@(aspectRatio) forKey:kCIInputAspectRatioKey];
+    
+    CIImage *outputImage = [_mirrorFilter valueForKey:kCIOutputImageKey];
+    
+    CGAffineTransform xform = CGAffineTransformConcat(
+                                                      CGAffineTransformMakeScale(-1, 1),
+                                                      CGAffineTransformMakeTranslation(inputImage.extent.size.width, 0)
+                                                      );
+
+    [_mirrorFilter setValue:[NSValue valueWithBytes:&xform
+                                      objCType:@encode(CGAffineTransform)]
+                forKey:kCIInputTransformKey];
+    
+    [_mirrorFilter setValue:inputImage forKey:kCIInputImageKey];
+    
+    [_scaleFilter setValue:[_mirrorFilter valueForKey:kCIOutputImageKey] forKey:kCIInputImageKey];
+    return _mirrorFilter.outputImage;
+}
+
 
 @end

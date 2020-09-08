@@ -103,6 +103,7 @@ typedef NS_ENUM(NSInteger,LFLiveCaptureTypeMask) {
 
 
 - (void)pushVideoBuffer:(CMSampleBufferRef)sampleBuffer;
+- (void)pushVideo:(nullable CVPixelBufferRef)pixelBuffer;
 - (void)pushAudioBuffer:(CMSampleBufferRef)sampleBuffer;
 
 /*
