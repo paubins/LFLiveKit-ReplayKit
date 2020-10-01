@@ -1,0 +1,4 @@
+{
+	"Simulator Target Bundle" : "com.paubins.LiveVideoShare",
+	"aps" : { "alert" : "This is a test notification." }
+}

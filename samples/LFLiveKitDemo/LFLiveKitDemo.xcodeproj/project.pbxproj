@@ -24,6 +24,10 @@
 		84D8B4391D75778B00752B56 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D8B4371D75778B00752B56 /* LaunchScreen.storyboard */; };
 		A60557933ABE8BD8320A6563 /* libPods-Recoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEAB304836FA19395379F02E /* libPods-Recoder.a */; };
 		BC8B37EEE1CEEF9B5614DC91 /* libPods-LFLiveKitDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B1CCEEE06FCFAF75D105A51 /* libPods-LFLiveKitDemo.a */; };
+		C16F2F25251A74AA00F6839F /* AuthorizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C16F2F24251A74AA00F6839F /* AuthorizationManager.m */; };
+		C1EB5EBB251938BA0088897C /* PermissionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1EB5EBA251938BA0088897C /* PermissionsViewController.m */; };
+		C1EB5EC025193A8D0088897C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1EB5EBF25193A8D0088897C /* AVFoundation.framework */; };
+		C1EED09F250EC42500E73A4B /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1EED09E250EC42500E73A4B /* UserNotifications.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +91,14 @@
 		84D8B43A1D75778B00752B56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8805CD774E7D06C8E63B10C9 /* Pods-Recoder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Recoder.release.xcconfig"; path = "Pods/Target Support Files/Pods-Recoder/Pods-Recoder.release.xcconfig"; sourceTree = "<group>"; };
 		96E1231310083A3881AD2AB6 /* Pods-LFLiveKitDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFLiveKitDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-LFLiveKitDemo/Pods-LFLiveKitDemo.release.xcconfig"; sourceTree = "<group>"; };
+		C16F2F23251A74AA00F6839F /* AuthorizationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AuthorizationManager.h; sourceTree = "<group>"; };
+		C16F2F24251A74AA00F6839F /* AuthorizationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AuthorizationManager.m; sourceTree = "<group>"; };
+		C1918FB5251575CA00BE3E74 /* Recoder.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Recoder.entitlements; sourceTree = "<group>"; };
+		C1EB5EB9251938BA0088897C /* PermissionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PermissionsViewController.h; sourceTree = "<group>"; };
+		C1EB5EBA251938BA0088897C /* PermissionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PermissionsViewController.m; sourceTree = "<group>"; };
+		C1EB5EBF25193A8D0088897C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		C1EED09D250EC2B300E73A4B /* LFLiveKitDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LFLiveKitDemo.entitlements; sourceTree = "<group>"; };
+		C1EED09E250EC42500E73A4B /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		FEAB304836FA19395379F02E /* libPods-Recoder.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Recoder.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -113,8 +125,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1EB5EC025193A8D0088897C /* AVFoundation.framework in Frameworks */,
 				7D7F5D69219BF41F0040FBE4 /* libc++.tbd in Frameworks */,
 				BC8B37EEE1CEEF9B5614DC91 /* libPods-LFLiveKitDemo.a in Frameworks */,
+				C1EED09F250EC42500E73A4B /* UserNotifications.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +138,8 @@
 		65E0CF98FF954863E543A0E1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C1EB5EBF25193A8D0088897C /* AVFoundation.framework */,
+				C1EED09E250EC42500E73A4B /* UserNotifications.framework */,
 				7D7F5D68219BF41F0040FBE4 /* libc++.tbd */,
 				5B1CCEEE06FCFAF75D105A51 /* libPods-LFLiveKitDemo.a */,
 				7D0A55C121B8FFE100695148 /* ReplayKit.framework */,
@@ -136,6 +152,7 @@
 		7D0A55C321B8FFE100695148 /* Recoder */ = {
 			isa = PBXGroup;
 			children = (
+				C1918FB5251575CA00BE3E74 /* Recoder.entitlements */,
 				7D0A55C421B8FFE100695148 /* SampleHandler.h */,
 				7D0A55C521B8FFE100695148 /* SampleHandler.m */,
 				7D0A55C721B8FFE100695148 /* Info.plist */,
@@ -180,6 +197,9 @@
 		84D8B4281D75778B00752B56 /* LFLiveKitDemo */ = {
 			isa = PBXGroup;
 			children = (
+				C16F2F23251A74AA00F6839F /* AuthorizationManager.h */,
+				C16F2F24251A74AA00F6839F /* AuthorizationManager.m */,
+				C1EED09D250EC2B300E73A4B /* LFLiveKitDemo.entitlements */,
 				84D8B42C1D75778B00752B56 /* AppDelegate.h */,
 				84D8B42D1D75778B00752B56 /* AppDelegate.m */,
 				84D8B42F1D75778B00752B56 /* ViewController.h */,
@@ -189,6 +209,8 @@
 				84D8B4371D75778B00752B56 /* LaunchScreen.storyboard */,
 				84D8B43A1D75778B00752B56 /* Info.plist */,
 				84D8B4291D75778B00752B56 /* Supporting Files */,
+				C1EB5EB9251938BA0088897C /* PermissionsViewController.h */,
+				C1EB5EBA251938BA0088897C /* PermissionsViewController.m */,
 			);
 			path = LFLiveKitDemo;
 			sourceTree = "<group>";
@@ -430,8 +452,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				84D8B4311D75778B00752B56 /* ViewController.m in Sources */,
+				C1EB5EBB251938BA0088897C /* PermissionsViewController.m in Sources */,
 				84D8B42E1D75778B00752B56 /* AppDelegate.m in Sources */,
 				84D8B42B1D75778B00752B56 /* main.m in Sources */,
+				C16F2F25251A74AA00F6839F /* AuthorizationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,14 +514,16 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = RecoderSetupUI/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku.RecoderSetupUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare.RecoderSetupUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -524,13 +550,15 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = RecoderSetupUI/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku.RecoderSetupUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare.RecoderSetupUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -556,16 +584,19 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Recoder/Recoder.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Recoder/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku.Recoder;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare.Recoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -591,15 +622,18 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Recoder/Recoder.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Recoder/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku.Recoder;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare.Recoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -693,17 +727,21 @@
 			baseConfigurationReference = 289A9C4510CD7EA6F4CE9897 /* Pods-LFLiveKitDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LFLiveKitDemo/LFLiveKitDemo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = LFLiveKitDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MARKETING_VERSION = 0.1;
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -712,17 +750,21 @@
 			baseConfigurationReference = 96E1231310083A3881AD2AB6 /* Pods-LFLiveKitDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LFLiveKitDemo/LFLiveKitDemo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 3XSPEUHQ6Y;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = LFLiveKitDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MARKETING_VERSION = 0.1;
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.LFLivekit.youku;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paubins.LiveVideoShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

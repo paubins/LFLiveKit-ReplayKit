@@ -55,10 +55,10 @@
     _lastPTS = kCMTimeInvalid;
     _timescale = 1000;
     frameCount = 0;
-#ifdef DEBUG
+
     enabledWriteVideoFile = NO;
     [self initForFilePath];
-#endif
+
     
     _encoder = [LFAVEncoder encoderForHeight:(int)_configuration.videoSize.height andWidth:(int)_configuration.videoSize.width bitrate:(int)_configuration.videoBitRate];
     [_encoder encodeWithBlock:^int(NSArray* dataArray, CMTimeValue ptsValue) {

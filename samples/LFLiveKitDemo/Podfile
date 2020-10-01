@@ -4,6 +4,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 target 'LFLiveKitDemo' do
     inhibit_all_warnings!
     pod 'LFLiveKit-ReplayKit', :path => '../../.'
+    pod 'Devise', '~> 1.1.0'
 end
 
 target 'Recoder' do

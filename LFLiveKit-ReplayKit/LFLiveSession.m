@@ -78,7 +78,7 @@
     if (self = [super init]) {
         _audioConfiguration = audioConfiguration;
         _videoConfiguration = videoConfiguration;
-        _adaptiveBitrate = NO;
+        _adaptiveBitrate = YES;
         _captureType = captureType;
     }
     return self;

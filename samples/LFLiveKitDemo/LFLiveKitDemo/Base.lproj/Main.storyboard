@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -20,11 +19,173 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="SI4-Vf-8tf">
+                                <rect key="frame" x="70.5" y="197.5" width="234.5" height="272.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Toggle screen mirroring:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qrf-6N-xZX">
+                                        <rect key="frame" x="24.5" y="0.0" width="185" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="BuS-gS-6jh">
+                                        <rect key="frame" x="92.5" y="54.5" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="mirrorToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="QYf-nq-LGj"/>
+                                        </connections>
+                                    </switch>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start/stop stream:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5k6-Ex-Mrd">
+                                        <rect key="frame" x="48.5" y="120" width="137.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zXR-KC-LQC" customClass="RPSystemBroadcastPickerView">
+                                        <rect key="frame" x="2" y="165.5" width="230.5" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="preferredExtension" value="com.paubins.LiveVideoShare.Recoder"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KLo-Rj-EBX">
+                                        <rect key="frame" x="56.5" y="235.5" width="121" height="0.0"/>
+                                        <state key="normal" title="Copy Stream Link"/>
+                                        <connections>
+                                            <action selector="openStream:" destination="BYZ-38-t0r" eventType="touchUpInside" id="khN-YH-SK0"/>
+                                        </connections>
+                                    </button>
+                                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="NXy-3Q-A7e">
+                                        <rect key="frame" x="98.5" y="235.5" width="37" height="37"/>
+                                    </activityIndicatorView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="zXR-KC-LQC" firstAttribute="top" secondItem="5k6-Ex-Mrd" secondAttribute="bottom" constant="25" id="6sw-Ox-4uw"/>
+                                    <constraint firstItem="zXR-KC-LQC" firstAttribute="leading" secondItem="SI4-Vf-8tf" secondAttribute="leading" constant="2" id="RfC-tA-1LZ"/>
+                                    <constraint firstItem="zXR-KC-LQC" firstAttribute="top" secondItem="SI4-Vf-8tf" secondAttribute="top" constant="165.5" id="o2i-cs-trZ"/>
+                                    <constraint firstItem="KLo-Rj-EBX" firstAttribute="top" secondItem="zXR-KC-LQC" secondAttribute="bottom" constant="20" id="zFr-3r-zhb"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="SI4-Vf-8tf" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ctG-0i-wAW"/>
+                            <constraint firstItem="SI4-Vf-8tf" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="f0q-M0-yZa"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="broadcastButton" destination="zXR-KC-LQC" id="veq-VX-UU4"/>
+                        <outlet property="streamActivityLoader" destination="NXy-3Q-A7e" id="6KO-V8-75H"/>
+                        <outlet property="viewStream" destination="KLo-Rj-EBX" id="4qA-dX-Fv5"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="136.80000000000001" y="132.68365817091455"/>
+        </scene>
+        <!--Permissions View Controller-->
+        <scene sceneID="cT8-ex-rP8">
+            <objects>
+                <viewController storyboardIdentifier="PermissionsViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="sgO-Iz-HyY" customClass="PermissionsViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="VcE-w7-xWo"/>
+                        <viewControllerLayoutGuide type="bottom" id="t3o-NH-8t0"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Dze-tb-q93">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="SuU-lG-6cw">
+                                <rect key="frame" x="37" y="222" width="301.5" height="223.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please grant permissions to continue:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q4H-2j-ozA">
+                                        <rect key="frame" x="0.0" y="0.0" width="301.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="dYk-HR-ggf">
+                                        <rect key="frame" x="0.0" y="40.5" width="301.5" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable camera permissions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MRA-ed-o6j">
+                                                <rect key="frame" x="0.0" y="0.0" width="208.5" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Q0h-bE-ydU">
+                                                <rect key="frame" x="252.5" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="toggleCameraPermissions:" destination="sgO-Iz-HyY" eventType="valueChanged" id="3Wb-Ac-UAX"/>
+                                                </connections>
+                                            </switch>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="aTT-MS-gfi">
+                                        <rect key="frame" x="0.0" y="91.5" width="301.5" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable microphone permissions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Py-Xs-DMw">
+                                                <rect key="frame" x="0.0" y="0.0" width="242.5" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="9gb-ZG-eaT">
+                                                <rect key="frame" x="252.5" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="enableMicrophonPermissions:" destination="sgO-Iz-HyY" eventType="valueChanged" id="c0w-iJ-QX1"/>
+                                                </connections>
+                                            </switch>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="TTZ-es-yMw">
+                                        <rect key="frame" x="0.0" y="142.5" width="301.5" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable push notifications" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MTS-pW-W2n">
+                                                <rect key="frame" x="0.0" y="0.0" width="191" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="hRa-E0-eTG">
+                                                <rect key="frame" x="252.5" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="enablePushNotifications:" destination="sgO-Iz-HyY" eventType="valueChanged" id="oNc-cg-eq3"/>
+                                                </connections>
+                                            </switch>
+                                        </subviews>
+                                    </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jOu-cX-eZe">
+                                        <rect key="frame" x="0.0" y="193.5" width="301.5" height="30"/>
+                                        <state key="normal" title="Continue"/>
+                                        <connections>
+                                            <action selector="continueButton:" destination="sgO-Iz-HyY" eventType="touchUpInside" id="cXr-fM-XXN"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="SuU-lG-6cw" firstAttribute="centerY" secondItem="Dze-tb-q93" secondAttribute="centerY" id="taV-St-57M"/>
+                            <constraint firstItem="SuU-lG-6cw" firstAttribute="centerX" secondItem="Dze-tb-q93" secondAttribute="centerX" id="yHY-6u-Xo1"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="continueButton" destination="jOu-cX-eZe" id="7gM-mk-mnD"/>
+                        <outlet property="enableCameraButton" destination="Q0h-bE-ydU" id="vNh-b6-RDt"/>
+                        <outlet property="enableMicrophoneButton" destination="9gb-ZG-eaT" id="7vc-Il-8qj"/>
+                        <outlet property="enablePushNotifications" destination="hRa-E0-eTG" id="wtW-Vs-FH8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c6W-oA-JLH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-66.400000000000006" y="-564.46776611694156"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

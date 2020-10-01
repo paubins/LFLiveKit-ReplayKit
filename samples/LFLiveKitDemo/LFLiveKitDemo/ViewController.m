@@ -10,6 +10,9 @@
 #import <ReplayKit/ReplayKit.h>
 #import <LFLiveKit.h>
 #import "AppDelegate.h"
+#import <UserNotifications/UserNotifications.h>
+#import "PermissionsViewController.h"
+#import "AuthorizationManager.h"
 
 inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     if (elapsed_milli <= 0) {
@@ -32,7 +35,14 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 @interface ViewController () <LFLiveSessionDelegate, RPBroadcastControllerDelegate, RPBroadcastActivityViewControllerDelegate>
 @property (nonatomic, strong) LFLiveSession *session;
 @property (nonatomic, strong) UIView *testView;
+@property (weak, nonatomic) IBOutlet UITextField *streamLocationTextField;
+@property (weak, nonatomic) IBOutlet UIButton *startStreamButton;
+@property (weak, nonatomic) IBOutlet UIButton *viewStream;
 @property (nonatomic, strong) RPBroadcastController *broadcastController;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *streamActivityLoader;
+@property (weak, nonatomic) IBOutlet RPSystemBroadcastPickerView *broadcastButton;
+@property (strong, nonatomic) PermissionsViewController *permissionsViewController;
+@property (strong, nonatomic) NSTimer *timer;
 @end
 
 @implementation ViewController
@@ -41,65 +51,20 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self checkStreamLink];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     
-    [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:@"https://www.baidu.com"] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        // 请求网络权限
-    }] resume];
-    
-    UIView *testView = ({
-        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
-        [view setBackgroundColor:[UIColor purpleColor]];
-        view;
-    });
-    [self.view addSubview:testView];
-    
-    {
-        /*
-         这个动画会让直播一直有视频帧
-         动画类型不限，只要屏幕是变化的就会有视频帧
-         */
-        [testView.layer removeAllAnimations];
-        CABasicAnimation *rA = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rA.duration = 3.0;
-        rA.toValue = [NSNumber numberWithFloat:M_PI * 2];
-        rA.repeatCount = MAXFLOAT;
-        rA.removedOnCompletion = NO;
-        [testView.layer addAnimation:rA forKey:@""];
+    if (![AuthorizationManager checkAuthorizations]) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+        self.permissionsViewController = [sb instantiateViewControllerWithIdentifier:@"PermissionsViewController"];
+        self.permissionsViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:self.permissionsViewController animated:YES completion:^{
+            NSLog(@"shown permissions");
+        }];
     }
-    
-    UIButton *perpareButton = ({
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-        [button setFrame:CGRectMake(50, 300, 100, 50)];
-        [button setTitle:@"Perpare" forState:UIControlStateNormal];
-        // 连接直播端口 < 准备直播
-        [button addTarget:self action:@selector(perpare) forControlEvents:UIControlEventTouchUpInside];
-        button;
-    });
-    
-    UIButton *statrButton1 = ({
-        // 第一种直播方式
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-        [button setFrame:CGRectMake(130, 300, 100, 50)];
-        [button setTitle:@"Start" forState:UIControlStateNormal];
-        // 点击开始推流
-        [button addTarget:self action:@selector(statrButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        button;
-    });
-    
-    UIButton *statrButton2 = ({
-        // 第二种直播方式 调用Extension
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-        [button setFrame:CGRectMake(300, 300, 150, 50)];
-        [button setTitle:@"Extension" forState:UIControlStateNormal];
-        // 点击开始推流
-        [button addTarget:self action:@selector(startLive) forControlEvents:UIControlEventTouchUpInside];
-        button;
-    });
-    
-    [self.view addSubview:perpareButton];
-    [self.view addSubview:statrButton1];
-    [self.view addSubview:statrButton2];
-    
 }
 
 #pragma mark -- Getter Setter
@@ -113,6 +78,16 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         videoConfiguration = [LFLiveVideoConfiguration defaultConfigurationForQuality:LFLiveVideoQuality_High2 outputImageOrientation:UIInterfaceOrientationLandscapeRight];
         
         videoConfiguration.autorotate = YES;
+        
+        NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+        NSString *shouldMirror = [userDefaults valueForKey:@"shouldMirror"];
+        if (shouldMirror == nil) {
+            [userDefaults setValue:@"0" forKey:@"shouldMirror"];
+        } else if ([shouldMirror isEqualToString:@"1"]) {
+            videoConfiguration.mirror = YES;
+        } else {
+            videoConfiguration.mirror = NO;
+        }
         
         _session = [[LFLiveSession alloc] initWithAudioConfiguration:audioConfiguration videoConfiguration:videoConfiguration captureType:LFLiveInputMaskAll];
         
@@ -155,15 +130,19 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     NSLog(@"errorCode: %lu", (unsigned long)errorCode);
 }
 
+- (IBAction)startStream:(id)sender {
+    NSString *streamURL = @"rtmp://live-sfo.twitch.tv/app/live_548605499_G0ldfV1VLQqHQHdjYzOgI4NXJTEIIj";
+    self.streamLocationTextField.hidden = NO;
+    [self.streamActivityLoader startAnimating];
+    [self startLive];
+}
 
-- (void)perpare {
+- (void)perpare:(NSString *)streamURL {
     LFLiveStreamInfo *stream = [LFLiveStreamInfo new];
     // /直播推流地址
-    stream.url = @"rtmp://live-sfo.twitch.tv/app/live_548605499_G0ldfV1VLQqHQHdjYzOgI4NXJTEIIj";
-    
+    stream.url = streamURL;
+    self.streamLocationTextField.text = stream.url;
     [self.session startLive:stream];
-    
-    
     [[RPScreenRecorder sharedRecorder] setMicrophoneEnabled:YES];
 }
 
@@ -258,11 +237,106 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         
     }];
 }
+- (IBAction)openStream:(id)sender {
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+    NSString *streamToken = [userDefaults valueForKey:@"streamToken"];
+//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:]];
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = [NSString stringWithFormat:@"https://wideshotapp.com/hls/%@/index.m3u8", streamToken];
+    
+    [self.viewStream setTitle:@"Copied!" forState:UIControlStateNormal];
+    
+    if (self.timer == nil) {
+        [NSTimer scheduledTimerWithTimeInterval:2.0f repeats:NO block:^(NSTimer * _Nonnull timer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.viewStream setTitle:@"Copy Stream Link" forState:UIControlStateNormal];
+                self.timer = nil;
+            });
+        }];
+    }
+}
+
+- (void)checkStreamLink {
+    [self.streamActivityLoader startAnimating];
+    [self checkStream:^(BOOL isStreaming){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+            if (isStreaming) {
+                self.viewStream.hidden = NO;
+            } else {
+                self.viewStream.hidden = YES;
+                [self.streamActivityLoader stopAnimating];
+                [userDefaults setValue:nil forKey:@"streamToken"];
+            }
+        });
+    }];
+}
+
+- (IBAction)mirrorToggled:(id)sender {
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+    
+    if([sender isOn]){
+        NSLog(@"Switch is ON");
+        [userDefaults setValue:@"1" forKey:@"shouldMirror"];
+    } else{
+        NSLog(@"Switch is OFF");
+        [userDefaults setValue:@"0" forKey:@"shouldMirror"];
+    }
+}
+
+- (void)checkStream:(void (^)(BOOL))completionBlock {
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+    
+    NSString *userID = [userDefaults valueForKey:@"userID"];
+    if (!userID) {
+        return;
+    }
+    
+    NSError *error;
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
+    NSURL *url = [NSURL URLWithString:@"https://www.wideshotapp.com/checkStream"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                       timeoutInterval:60.0];
+
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+
+    [request setHTTPMethod:@"POST"];
+    
+    NSDictionary *mapData = [[NSDictionary alloc] initWithObjectsAndKeys:
+                             userID, @"userID",
+                         nil];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:mapData options:0 error:&error];
+    [request setHTTPBody:postData];
+
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error == nil) {
+            NSError *newError;
+            NSMutableDictionary *innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&newError];
+            if ([innerJson[@"streaming"] isEqualToString:@"false"]) {
+                completionBlock(NO);
+            } else {
+                completionBlock(YES);
+            }
+        }
+    }];
+
+    [postDataTask resume];
+}
+
 
 #pragma mark - Broadcasting
 - (void)broadcastActivityViewController:(RPBroadcastActivityViewController *) broadcastActivityViewController
        didFinishWithBroadcastController:(RPBroadcastController *)broadcastController
                                   error:(NSError *)error {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.streamLocationTextField.hidden = YES;
+        [self.streamActivityLoader stopAnimating];
+    });
+
     
     [broadcastActivityViewController dismissViewControllerAnimated:YES
                                                         completion:nil];

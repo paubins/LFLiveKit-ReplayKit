@@ -53,11 +53,11 @@
         [self resetCompressionSession];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterBackground:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationDidBecomeActiveNotification object:nil];
-#ifdef DEBUG
+
         enabledWriteVideoFile = NO;
         [self initCapture];
         [self initForFilePath];
-#endif
+
         
     }
     return self;
@@ -358,6 +358,10 @@ static void VideoCompressonOutputCallback(void *VTref, void *VTFrameRef, OSStatu
 
 - (CIImage*) scaleFilterImage: (CIImage*)inputImage withAspectRatio:(CGFloat)aspectRatio scale:(CGFloat)scale
 {
+    if (!_configuration.mirror) {
+        return inputImage;
+    }
+    
 //    [_scaleFilter setValue:inputImage forKey:kCIInputImageKey];
     [_scaleFilter setValue:@(scale) forKey:kCIInputScaleKey];
     [_scaleFilter setValue:@(aspectRatio) forKey:kCIInputAspectRatioKey];

@@ -53,15 +53,35 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     _mic = [dict[@"mic"] boolValue];
     _mic = YES;
     _frameQuality = [dict[@"frameQuality"] intValue]; // 0 高 1中 2低
-    if (!_url) {
-        _url = @"http://paubins.com/live/testing123";
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+    NSString *userID = [userDefaults valueForKey:@"userID"];
+    NSString *streamToken = [self randomStringWithLength:10];
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    [self prepareTokenForStream:streamToken withUserID:userID completionBlock:^{
+        dispatch_semaphore_signal(sema);
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    if (!self.url) {
+        self.url = [NSString stringWithFormat:@"https://www.wideshotapp.com/live/%@", streamToken];
     }
     [self lf];
 }
+
 - (void)lf {
     LFLiveStreamInfo *stream = [LFLiveStreamInfo new];
     stream.url = _url;
     [self.session startLive:stream];
+}
+
+- (NSString *) randomStringWithLength:(int)len {
+    NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    NSMutableString *randomString = [NSMutableString stringWithCapacity: len];
+
+    for (int i=0; i<len; i++) {
+         [randomString appendFormat: @"%C", [letters characterAtIndex: arc4random_uniform([letters length])]];
+    }
+    return randomString;
 }
 
 #pragma mark -- Getter Setter
@@ -75,6 +95,8 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         videoConfiguration = [LFLiveVideoConfiguration defaultConfigurationForQuality:(_frameQuality==0)?LFLiveVideoQuality_High2:(_frameQuality==1)?LFLiveVideoQuality_Medium2:LFLiveVideoQuality_Low2 outputImageOrientation:UIInterfaceOrientationPortrait];
         
         videoConfiguration.autorotate = YES;
+        NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.paubins"];
+        videoConfiguration.mirror = [[userDefaults valueForKey:@"shouldMirror"] isEqualToString:@"1"];
         
         _session = [[LFLiveSession alloc] initWithAudioConfiguration:audioConfiguration
                                                   videoConfiguration:videoConfiguration
@@ -138,6 +160,37 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     NSLog(@"errorCode: %ld", errorCode);
 }
 
+
+- (void)prepareTokenForStream:(NSString *)streamToken withUserID:(NSString *)userID completionBlock:(void (^)())completionBlock {
+    NSLog(streamToken);
+    NSError *error;
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
+    NSURL *url = [NSURL URLWithString:@"https://www.wideshotapp.com/storeStreamToken"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                       timeoutInterval:60.0];
+
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+
+    [request setHTTPMethod:@"POST"];
+    
+    NSDictionary *mapData = [[NSDictionary alloc] initWithObjectsAndKeys:
+                             userID, @"userID",
+                             streamToken, @"streamToken",
+                         nil];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:mapData options:0 error:&error];
+    [request setHTTPBody:postData];
+
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error == nil) {
+            completionBlock();
+        }
+    }];
+
+    [postDataTask resume];
+}
 
 
 @end
